@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini Game Hub</title>
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#2563eb;
+      --accent-2:#06b6d4;
+      --muted:#94a3b8;
+      --glass: rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      background:linear-gradient(180deg,#071029 0%, var(--bg) 100%);
+      color:#fefefe;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:24px;
+    }
+
+    header{
+      width:100%;
+      max-width:1100px;
+      display:flex;
+      gap:16px;
+      align-items:center;
+      margin-bottom:20px;
+    }
+    header h1{
+      margin:0;
+      font-size:1.6rem;
+      color:var(--accent);
+    }
+    header p{margin:0;color:var(--muted)}
+
+    .hub{
+      width:100%;
+      max-width:1100px;
+      display:grid;
+      grid-template-columns: 300px 1fr;
+      gap:20px;
+    }
+
+    /* sidebar */
+    .sidebar{
+      background:var(--card);
+      padding:18px;
+      border-radius:12px;
+      box-shadow:0 8px 20px rgba(2,6,23,0.6);
+    }
+    .games-list{display:flex;flex-direction:column;gap:8px}
+    .game-btn{
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,0.03);
+      color:inherit;
+      padding:10px 12px;
+      border-radius:8px;
+      text-align:left;
+      cursor:pointer;
+      transition:all .18s ease;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .game-btn:hover{transform:translateX(6px); box-shadow:0 6px 14px rgba(37,99,235,0.12)}
+    .game-btn.active{background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#071029; font-weight:700}
+
+    .highscores{
+      margin-top:16px;
+      background:rgba(255,255,255,0.02);
+      padding:12px;border-radius:8px;
+      font-size:0.95rem;
+    }
+    .highscores h3{margin:0 0 8px 0;color:var(--accent)}
+
+    /* main area */
+    .main{
+      background:var(--card);
+      padding:22px;
+      border-radius:12px;
+      min-height:480px;
+      box-shadow:0 8px 30px rgba(2,6,23,0.6);
+    }
+
+    /* shared UI */
+    .center{display:flex;align-items:center;justify-content:center}
+    .big-btn{
+      background:var(--accent);
+      color:#041026;
+      padding:12px 20px;
+      border-radius:10px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+      transition:all .15s;
+    }
+    .big-btn:hover{transform:translateY(-3px); filter:brightness(.98)}
+
+    /* Clicker game styles */
+    .clicker-wrap{display:flex;flex-direction:column;gap:12px;align-items:center}
+    .click-target{
+      width:220px;height:220px;border-radius:50%;
+      background:linear-gradient(180deg,#60a5fa,#2563eb);
+      display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:#06102a;
+      box-shadow:0 8px 30px rgba(37,99,235,0.2);cursor:pointer;user-select:none;
+    }
+    .meter{display:flex;gap:10px;align-items:center}
+
+    /* Memory styles */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(80px,1fr));
+      gap:10px;
+    }
+    .card{
+      background:linear-gradient(180deg,#071b2b,#092636);
+      height:100px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+      cursor:pointer;user-select:none;color:transparent;
+      transition:transform .18s, background .18s;
+      box-shadow:0 6px 14px rgba(0,0,0,0.4);
+    }
+    .card.flipped{color:#fff;background:linear-gradient(180deg,#2563eb,#06b6d4);transform:rotateY(0deg)}
+    .card.matched{background:linear-gradient(90deg,#22c55e,#16a34a);cursor:default;box-shadow:none}
+
+    /* Trivia styles */
+    .question{font-size:1.1rem;margin-bottom:12px}
+    .option{background:var(--glass);padding:10px;border-radius:8px;margin:8px 0;cursor:pointer}
+    .option:hover{transform:translateX(6px)}
+
+    footer{margin-top:22px;color:var(--muted);font-size:0.9rem}
+
+    /* responsive */
+    @media (max-width:880px){
+      .hub{grid-template-columns:1fr; }
+      header{flex-direction:column;align-items:flex-start;gap:8px}
+    }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <div style="display:flex;flex-direction:column">
+      <h1>Maceo's Mini Game Hub</h1>
+      <p>Three fun games — Make new highscore !</p>
+    </div>
+  </header>
+
+  <main class="hub" role="main">
+    <aside class="sidebar" aria-label="Game menu">
+      <div class="games-list" role="tablist" aria-orientation="vertical">
+        <button class="game-btn active" data-game="clicker" role="tab">🎯 Click Rush</button>
+        <button class="game-btn" data-game="memory" role="tab">🧠 Memory Match</button>
+        <button class="game-btn" data-game="trivia" role="tab">❓ Quick Trivia</button>
+      </div>
+
+      <div class="highscores" aria-live="polite">
+        <h3>High Scores</h3>
+        <div id="scores">
+          <div>Click Rush: <strong id="score-click">0</strong></div>
+          <div>Memory: <strong id="score-memory">0</strong></div>
+          <div>Trivia: <strong id="score-trivia">0</strong></div>
+        </div>
+        <div style="margin-top:10px;text-align:center">
+          <button class="big-btn" onclick="resetScores()">Reset Scores</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="main" id="gameArea" tabindex="0">
+      <!-- Clicker -->
+      <div id="clicker" class="game active" aria-hidden="false">
+        <div class="clicker-wrap center" style="margin-top:12px">
+          <div class="meter">
+            <div>Time:</div><div id="clicker-time">10</div>s
+            <div style="width:18px"></div>
+            <div>Score:</div><div id="clicker-score">0</div>
+          </div>
+        </div>
+        <div style="height:18px"></div>
+        <div class="center">
+          <div id="clickTarget" class="click-target" role="button" aria-pressed="false" tabindex="0">Click</div>
+        </div>
+        <div style="height:18px"></div>
+        <div class="center">
+          <button class="big-btn" id="startClicker">Start Click Rush (10s)</button>
+        </div>
+      </div>
+
+      <!-- Memory -->
+      <div id="memory" class="game" style="display:none" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>Turns: <strong id="mem-turns">0</strong></div>
+          <div>Matches: <strong id="mem-matches">0</strong></div>
+          <div><button class="big-btn" id="startMemory">Restart</button></div>
+        </div>
+        <div style="height:14px"></div>
+        <div id="memGrid" class="grid" aria-live="polite"></div>
+      </div>
+
+      <!-- Trivia -->
+      <div id="trivia" class="game" style="display:none" aria-hidden="true">
+        <div id="trivia-area">
+          <div id="questionBlock">
+            <div class="question" id="qText"></div>
+            <div id="options"></div>
+          </div>
+          <div style="height:12px"></div>
+          <div class="center">
+            <div>Score: <strong id="trivia-score">0</strong></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>&copy; 2025 Maceo's Mini Game Hub — built for fun</footer>
+
+<script>
+/* ---------- Simple router for game selection ---------- */
+const tabs = document.querySelectorAll('.game-btn');
+const games = { clicker: document.getElementById('clicker'),
+                memory: document.getElementById('memory'),
+                trivia: document.getElementById('trivia') };
+tabs.forEach(t=>{
+  t.addEventListener('click', ()=> {
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    // show/hide
+    const name = t.dataset.game;
+    for(const k in games){
+      const el = games[k];
+      if(k===name){ el.style.display='block'; el.setAttribute('aria-hidden','false'); }
+      else { el.style.display='none'; el.setAttribute('aria-hidden','true'); }
+    }
+  });
+});
+
+/* ---------- High Scores via localStorage ---------- */
+const hs = {
+  clicker: Number(localStorage.getItem('hs.clicker')||0),
+  memory: Number(localStorage.getItem('hs.memory')||0),
+  trivia: Number(localStorage.getItem('hs.trivia')||0)
+};
+document.getElementById('score-click').textContent = hs.clicker;
+document.getElementById('score-memory').textContent = hs.memory;
+document.getElementById('score-trivia').textContent = hs.trivia;
+function saveHigh(game,score){
+  if(score>hs[game]){
+    hs[game]=score;
+    localStorage.setItem('hs.'+game,score);
+    document.getElementById('score-'+game).textContent = score;
+  }
+}
+function resetScores(){
+  if(!confirm('Reset all high scores?')) return;
+  localStorage.removeItem('hs.clicker'); localStorage.removeItem('hs.memory'); localStorage.removeItem('hs.trivia');
+  hs.clicker=hs.memory=hs.trivia=0;
+  document.getElementById('score-click').textContent='0';
+  document.getElementById('score-memory').textContent='0';
+  document.getElementById('score-trivia').textContent='0';
+}
+
+/* ---------- Click Rush Game ---------- */
+let clickInterval=null;
+let clickTime=10; let clickScore=0; let clickRunning=false;
+const timeEl=document.getElementById('clicker-time');
+const scoreEl=document.getElementById('clicker-score');
+const target=document.getElementById('clickTarget');
+document.getElementById('startClicker').addEventListener('click', startClicker);
+target.addEventListener('click', ()=>{ if(clickRunning){ clickScore++; scoreEl.textContent=clickScore; pulseTarget(); }});
+target.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') target.click(); });
+
+function startClicker(){
+  if(clickRunning) return;
+  clickTime=10; clickScore=0; clickRunning=true;
+  timeEl.textContent = clickTime;
+  scoreEl.textContent = clickScore;
+  document.getElementById('startClicker').disabled=true;
+  clickInterval = setInterval(()=>{
+    clickTime--; timeEl.textContent = clickTime;
+    if(clickTime<=0){ endClicker(); }
+  },1000);
+}
+function endClicker(){
+  clearInterval(clickInterval);
+  clickRunning=false;
+  document.getElementById('startClicker').disabled=false;
+  alert('Time up! Score: '+clickScore);
+  saveHigh('clicker',clickScore);
+}
+function pulseTarget(){
+  target.style.transform='scale(0.95)';
+  setTimeout(()=> target.style.transform='scale(1)',80);
+}
+
+/* ---------- Memory Match Game ---------- */
+const startMemoryBtn = document.getElementById('startMemory');
+const memGrid = document.getElementById('memGrid');
+let memCards = [];
+let memFirst=null, memSecond=null;
+let memLock=false, memTurns=0, memMatches=0;
+
+startMemoryBtn.addEventListener('click', initMemory);
+function initMemory(){
+  memGrid.innerHTML=''; memFirst=null; memSecond=null; memLock=false; memTurns=0; memMatches=0;
+  document.getElementById('mem-turns').textContent = memTurns;
+  document.getElementById('mem-matches').textContent = memMatches;
+  // set of icons/emojis pairs
+  const icons = ['🍎','🍌','🍇','🍒','🍓','🍑','🍍','🥝'];
+  let deck = icons.concat(icons); // duplicated
+  // randomize and create cards
+  deck = deck.sort(()=>Math.random()-0.5);
+  deck.forEach((sym,idx)=>{
+    const c = document.createElement('div');
+    c.className='card'; c.tabIndex=0;
+    c.dataset.sym = sym;
+    c.textContent = sym; // hidden by color until flipped
+    c.addEventListener('click', onCardClick);
+    c.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') c.click();});
+    memGrid.appendChild(c);
+  });
+}
+function onCardClick(e){
+  if(memLock) return;
+  const c = e.currentTarget;
+  if(c.classList.contains('matched') || c.classList.contains('flipped')) return;
+  c.classList.add('flipped');
+  if(!memFirst){ memFirst=c; return; }
+  memSecond=c; memTurns++; document.getElementById('mem-turns').textContent=memTurns;
+  if(memFirst.dataset.sym === memSecond.dataset.sym){
+    memFirst.classList.add('matched'); memSecond.classList.add('matched');
+    memMatches++; document.getElementById('mem-matches').textContent=memMatches;
+    memFirst=null; memSecond=null;
+    if(memMatches === 8){
+      alert('You matched all cards! Turns: '+memTurns);
+      saveHigh('memory', Math.max(0, 100 - memTurns)); // score based on turns
+    }
+    return;
+  }
+  memLock=true;
+  setTimeout(()=>{ memFirst.classList.remove('flipped'); memSecond.classList.remove('flipped'); memFirst=null; memSecond=null; memLock=false; },700);
+}
+
+/* init first memory board */
+initMemory();
+
+/* ---------- Trivia Game ---------- */
+const triviaQuestions = [
+  { q:'Which language runs in the browser?', opts:['Python','JavaScript','C++','Java'], a:1 },
+  { q:'What does HTML stand for?', opts:['HyperText Markup Language','Home Tool Markup','HighText Machine Lang','Hyperlinks Text Markup Lang'], a:0 },
+  { q:'Which company developed the React library?', opts:['Google','Facebook','Microsoft','Apple'], a:1 }
+];
+let triIndex=0, triScore=0;
+const qText = document.getElementById('qText'), optsBlock=document.getElementById('options'), triScoreEl=document.getElementById('trivia-score');
+
+function loadTrivia(){
+  triIndex=0; triScore=0; triScoreEl.textContent=triScore;
+  showQuestion();
+}
+function showQuestion(){
+  const item = triviaQuestions[triIndex];
+  qText.textContent = `Q${triIndex+1}. ${item.q}`;
+  optsBlock.innerHTML='';
+  item.opts.forEach((o,i)=>{
+    const b = document.createElement('div'); b.className='option'; b.tabIndex=0; b.textContent=o;
+    b.addEventListener('click', ()=> chooseOption(i,b));
+    b.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') chooseOption(i,b);});
+    optsBlock.appendChild(b);
+  });
+}
+function chooseOption(i,el){
+  const correct = triviaQuestions[triIndex].a;
+  if(i===correct){
+    triScore+=10; triScoreEl.textContent=triScore;
+    el.style.background = 'linear-gradient(90deg,#54d89b,#10b981)';
+  } else {
+    el.style.background = 'linear-gradient(90deg,#f97316,#fb7185)';
+  }
+  // disable options
+  Array.from(optsBlock.children).forEach(node=>node.style.pointerEvents='none');
+  setTimeout(()=>{
+    triIndex++;
+    if(triIndex >= triviaQuestions.length){
+      alert('Quiz finished! Score: '+triScore);
+      saveHigh('trivia', triScore);
+      loadTrivia();
+    } else showQuestion();
+  },900);
+}
+loadTrivia();
+
+/* Accessibility: focus main area when game selected */
+document.querySelectorAll('.game-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> setTimeout(()=> document.getElementById('gameArea').focus(),60));
+});
+</script>
+ <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #040201;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #040600;
+      color: rgb(247, 248, 250);
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 900px;
+      margin: 30px auto;
+      background: rgb(247, 244, 244);
+      color: #0b0b0b;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(253, 250, 250, 0.1);
+    }
+
+    .achievement {
+      border-left: 5px solid #3b82f6;
+      padding-left: 15px;
+      margin-bottom: 25px;
+    }
+
+    .achievement h2 {
+      color: #267efa;
+    }
+
+    a {
+      display: inline-block;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      text-decoration: none;
+      margin-top: 20px;
+    }
+
+    a:hover {
+      background-color: #1e40af;
+    }
+  </style>
+<a href="./html">⬅ Back to Developer Log</a>
+ <script src="Script.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "developers-log",
+  "version": "1.0.0",
+  "description": "Professional Developer Log and Portfolio",
+  "scripts": {
+    "start": "npx -y http-server . -p 3000 -o -c-1"
+  },
+  "keywords": [],
+  "author": "Maceo F. McBryde",
+  "license": "ISC"
+}

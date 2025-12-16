@@ -1,12 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maceo's World</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevelopersLog</title>
+
+  <style>
+    /* 🔹 Inquiries Button (Top Left) */
+    .inquiries-box {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s ease;
+      z-index: 9999;
+    }
+
+    .inquiries-box:hover {
+      background-color: #1e40af;
+    }
+
+    /* 🔹 Hidden Popup Form */
+    .inquiry-form {
+      display: none;
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      background: white;
+      padding: 20px;
+      width: 250px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 9999;
+    }
+
+    .inquiry-form h3 {
+      color: #2563eb;
+      margin-top: 0;
+    }
+
+    .inquiry-form input,
+    .inquiry-form textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .inquiry-form button {
+      background-color: #2563eb;
+      color: white;
+      padding: 8px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .inquiry-form button:hover {
+      background-color: #1e40af;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #2563eb;
+      font-weight: bold;
+      float: right;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <h1>I will mold my own universe</h1>
-  <p>By:Maceo</p>
+
+  <!-- 🔹 Floating Inquiries Box -->
+  <div class="inquiries-box" onclick="toggleForm()">📩 Inquiries</div>
+
+  <!-- 🔹 Hidden Form -->
+  <div class="inquiry-form" id="inquiryForm">
+    <button class="close-btn" onclick="toggleForm()">✖</button>
+    <h3>Send a Message</h3>
+
+    <!-- Use Formspree (free) or your own backend email handler -->
+    <form action="https://formspree.io/f/xanlwpgv" method="POST">
+      <input type="text" name="name" placeholder="Your Name" required>
+      <input type="email" name="_replyto" placeholder="Your Email" required>
+      <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script>
+    // 🔹 Toggle the visibility of the form
+    function toggleForm() {
+      const form = document.getElementById("inquiryForm");
+      form.style.display = (form.style.display === "block") ? "none" : "block";
+    }
+  </script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head> <link rel="stylesheet" href="style.css">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TheFirstLog</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #040201;
+      color: #0f0c0c;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #040600;
+      color: rgb(247, 248, 250);
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 900px;
+      margin: 30px auto;
+      background: rgb(255, 255, 255);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(253, 250, 250, 0.1);
+    }
+
+    .log-entry {
+      border-left: 5px solid #3b82f6;
+      padding-left: 15px;
+      margin-bottom: 25px;
+    }
+
+    .log-entry h2 {
+      margin-bottom: 5px;
+      color: #267efa;
+    }
+
+    .log-entry p {
+      margin: 5px 0;
+    }
+
+    .log-entry .date {
+      font-size: 0.9em;
+      color: #0f1012;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      text-align: center;
+      background-color: #0b70fd;
+      color: #0c0c0c;
+      padding: 15px 0;
+      margin-top: 40px;
+      font-size: 0.9em;
+    }
+
+    .add-entry {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #2563eb;
+      color: rgb(7, 7, 7);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Developer's Log</h1>
+    <p>Documenting progress, challenges, and achievements</p>
+  </header>
+
+  <div class="container">
+    <div class="add-entry">
+      <button onclick="openAchievements()">Click To See Achievements</button>
+    </div>
+     <a href="achievements.html" class="log-link">
+      <div class="log-entry">
+        <h2>I.C.Stars</h2>
+        <div class="date"><strong>The Start</strong></div>
+        <p>
+          An immersive Technological and business experience. In this hands-on program I learn by doing, by building web-based applications to solve client challenges – with coding, business, and leadership along the way. With partners and corporate sponsors, I gained on-the-job experience with United Airlines, Salesforce, and other corporations developing the professional networking skills needed to jumpstart my career.
+        </p>
+      </div>
+    </a>
+      <a href="index.html" class="log-link">
+  <div class="log-entry">
+    <h2>About Me</h2>
+    <div class="date"><strong>Maceo' F McBryde</strong></div>
+    <p>
+      I am 23 years old and currently an intern. In my future I will become a very successful Technological entrepreneur. 
+      I am passionate about Learning and honing all forms of technology!
+    </p>
+  </div>
+</a>
+
+<style>
+  .log-link {
+    text-decoration: none; /* remove underline */
+    color: inherit;        /* keep same text color */
+    display: block;        /* makes the whole div clickable */
+  }
+
+  .log-entry {
+    border-left: 5px solid #3b82f6;
+    padding-left: 15px;
+    margin-bottom: 25px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .log-entry:hover {
+    background: #e5edff;
+    transform: scale(1.02); /* small pop effect */
+    cursor: pointer;
+  }
+
+  .log-entry h2 {
+    color: #267efa;
+  }
+</style>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 10/21/2025 Developer's Log | Built by Maceo' F McBryde | ARISE
+  </footer>
+
+  <script>
+    function openAchievements() {
+      // Go to your Achievements page
+      window.location.href = "achievements.html";
+    }
+  </script>
+  <script src="Script.js"></script>
+
 </body>
 </html>
